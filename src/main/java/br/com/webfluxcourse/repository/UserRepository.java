@@ -1,6 +1,7 @@
 package br.com.webfluxcourse.repository;
 
 import br.com.webfluxcourse.entity.User;
+import com.mongodb.client.result.DeleteResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Repository;
@@ -23,5 +24,10 @@ public class UserRepository {
 
     public Flux<User> findAll() {
         return mongoTemplate.findAll(User.class);
+    }
+
+    public Mono<DeleteResult> delete(String id) {
+        var user = findById(id);
+        return mongoTemplate.remove(user);
     }
 }

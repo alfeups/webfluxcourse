@@ -2,6 +2,7 @@ package br.com.webfluxcourse.controller;
 
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.model.response.UserResponse;
+import com.mongodb.client.result.DeleteResult;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,5 +25,5 @@ public interface UserController {
                                               @RequestBody UserRequest request);
 
     @DeleteMapping(value = "/{id}")
-    ResponseEntity<Mono<Void>> delete(@PathVariable String id);
+    ResponseEntity<Mono<DeleteResult>> delete(@PathVariable String id);
 }

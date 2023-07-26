@@ -5,6 +5,7 @@ import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.repository.UserRepository;
 import br.com.webfluxcourse.service.exception.ObjectNotFoundException;
+import com.mongodb.client.result.DeleteResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -33,5 +34,15 @@ public class UserService {
 
     public Flux<User> findAll(){
         return repository.findAll();
+    }
+
+    public Mono<User> update(final String id, final UserRequest request){
+        return findById(id)
+                .map(entity -> mapper.toEntity(request, entity))
+                .flatMap(repository::save);
+    }
+
+    public Mono<DeleteResult> delete(String id) {
+        return repository.delete(id);
     }
 }

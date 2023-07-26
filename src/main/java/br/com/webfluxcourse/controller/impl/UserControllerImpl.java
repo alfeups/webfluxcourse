@@ -5,6 +5,7 @@ import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.model.response.UserResponse;
 import br.com.webfluxcourse.service.UserService;
+import com.mongodb.client.result.DeleteResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +45,16 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<Mono<UserResponse>> update(String id, UserRequest request) {
-        return null;
+        return ResponseEntity.ok().body(
+                service.update(id, request)
+                        .map(mapper::toResponse)
+        );
     }
 
     @Override
-    public ResponseEntity<Mono<Void>> delete(String id) {
-        return null;
+    public ResponseEntity<Mono<DeleteResult>> delete(String id) {
+        return ResponseEntity.ok(
+                service.delete(id)
+        );
     }
 }
