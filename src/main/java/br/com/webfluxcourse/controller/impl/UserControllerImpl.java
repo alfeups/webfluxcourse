@@ -1,6 +1,7 @@
 package br.com.webfluxcourse.controller.impl;
 
 import br.com.webfluxcourse.controller.UserController;
+import br.com.webfluxcourse.entity.User;
 import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.model.response.UserResponse;
@@ -52,9 +53,9 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Mono<DeleteResult>> delete(String id) {
-        return ResponseEntity.ok(
-                service.delete(id)
-        );
+    public ResponseEntity<Mono<Void>> delete(String id) {
+        return ResponseEntity
+                .ok()
+                .body(service.delete(id).then());
     }
 }
