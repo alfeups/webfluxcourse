@@ -99,6 +99,9 @@ class UserControllerImplTest {
                 .jsonPath("$.id").isEqualTo(ID)
                 .jsonPath("$.name").isEqualTo(NAME)
                 .jsonPath("$.email").isEqualTo(EMAIL);
+
+        verify(service).findById(anyString());
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
@@ -133,11 +136,38 @@ class UserControllerImplTest {
     }
 
     @Test
-    void update() {
+    void whenUpdateUser_thenReturnSuccess() {
+        var userRequest = buildUserRequest();
+        var userRespose = buildUserResponse();
+        when(service.update(anyString(), any(UserRequest.class)))
+                .thenReturn(just(buildUser()));
+        when(mapper.toResponse(any(User.class))).thenReturn(userRespose);
+
+        client.patch().uri("/users" + "/" + ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(userRequest))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL);
+
+        verify(service).update(anyString(), any(UserRequest.class));
+        verify(mapper).toResponse(any(User.class));
     }
 
     @Test
-    void delete() {
+    @DisplayName("Test endpoint DELETE with success.")
+    void whenDeleteUser_thenReturnSuccess() {
+        when(service.delete(anyString())).thenReturn(just(buildUser()));
+
+        client.delete().uri("/users/" + ID)
+                .accept()
+                .exchange()
+                .expectStatus().isOk();
+
+        verify(service).delete(anyString());
     }
 
     private User buildUser() {
