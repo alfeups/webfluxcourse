@@ -1,12 +1,10 @@
 package br.com.webfluxcourse.controller.impl;
 
 import br.com.webfluxcourse.controller.UserController;
-import br.com.webfluxcourse.entity.User;
 import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.model.response.UserResponse;
 import br.com.webfluxcourse.service.UserService;
-import com.mongodb.client.result.DeleteResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
