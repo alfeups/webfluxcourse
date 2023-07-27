@@ -3,6 +3,7 @@ package br.com.webfluxcourse.controller.impl;
 import br.com.webfluxcourse.entity.User;
 import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
+import br.com.webfluxcourse.model.response.UserResponse;
 import br.com.webfluxcourse.service.UserService;
 import com.mongodb.reactivestreams.client.MongoClient;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -26,6 +29,11 @@ import static reactor.core.publisher.Mono.just;
 @SpringBootTest
 @AutoConfigureWebTestClient
 class UserControllerImplTest {
+
+    public static final String NAME = "alfeu";
+    public static final String EMAIL = "alfeu@hotmail.com";
+    final static String ID = "123";
+    public static final String PASSWORD = "123";
 
     @Autowired
     private WebTestClient client;
@@ -38,7 +46,6 @@ class UserControllerImplTest {
 
     @MockBean
     private MongoClient mongoClient;
-
 
     @Test
     @DisplayName("Test endpoint SAVE with success.")
@@ -79,11 +86,50 @@ class UserControllerImplTest {
 
 
     @Test
-    void findById() {
+    @DisplayName("Test find by ID endpoint successfully.")
+    void whenFindById_thenReturnSuccess() {
+        when(service.findById(anyString())).thenReturn(just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(buildUserResponse());
+
+        client.get().uri("/users/" + ID)
+                .accept()
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(ID)
+                .jsonPath("$.name").isEqualTo(NAME)
+                .jsonPath("$.email").isEqualTo(EMAIL);
     }
 
     @Test
+    @DisplayName("Test find by ID endpoint throwing exception.")
+    void whenFindById_thenThrowException() {
+        when(service.findById(anyString())).thenReturn(Mono.empty());
+        when(mapper.toResponse(any(User.class))).thenReturn(buildUserResponse());
+
+        client.get().uri("/users/" + "475685")
+                .accept()
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test find all users endpoint successfully.")
     void findAll() {
+        when(service.findAll()).thenReturn(Flux.just(User.builder().build()));
+        when(mapper.toResponse(any(User.class))).thenReturn(buildUserResponse());
+
+        client.get().uri("/users")
+                .accept()
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.[0].id").isEqualTo(ID)
+                .jsonPath("$.[0].name").isEqualTo(NAME)
+                .jsonPath("$.[0].email").isEqualTo(EMAIL)
+                .jsonPath("$.[0].password").isEqualTo(PASSWORD);
     }
 
     @Test
@@ -96,17 +142,21 @@ class UserControllerImplTest {
 
     private User buildUser() {
         return User.builder()
-                .id("123")
-                .name("alfeu")
-                .email("alfeu@hotmail.com")
-                .password("123")
+                .id(ID)
+                .name(NAME)
+                .email(EMAIL)
+                .password(PASSWORD)
                 .build();
     }
     private UserRequest buildUserRequest() {
-        return new UserRequest("alfeu", "alfeup@hotmail.com", "123");
+        return new UserRequest(NAME, EMAIL, PASSWORD);
     }
 
     private UserRequest buildBadUserRequest() {
-        return new UserRequest(" alfeu ", "alfeup@hotmail.com", "123");
+        return new UserRequest(" alfeu ", EMAIL, PASSWORD);
+    }
+
+    private UserResponse buildUserResponse() {
+        return new UserResponse(ID, NAME, EMAIL, PASSWORD);
     }
 }
