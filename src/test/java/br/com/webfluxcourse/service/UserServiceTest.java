@@ -3,7 +3,6 @@ package br.com.webfluxcourse.service;
 import br.com.webfluxcourse.entity.User;
 import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
-import br.com.webfluxcourse.model.response.UserResponse;
 import br.com.webfluxcourse.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +59,7 @@ class UserServiceTest {
         StepVerifier.create(result)
                 .expectNextMatches(user ->
                         user.getClass() == User.class
-                        && Objects.equals(user.getId(), "123"))
+                                && Objects.equals(user.getId(), "123"))
                 .expectComplete()
                 .verify();
 
@@ -87,7 +86,7 @@ class UserServiceTest {
         UserRequest request = buildUserRequest();
         User entity = buildUser();
 
-        when(mapper.toEntity(any(UserRequest.class),any(User.class))).thenReturn(entity);
+        when(mapper.toEntity(any(UserRequest.class), any(User.class))).thenReturn(entity);
         when(repository.findById(anyString())).thenReturn(Mono.just(entity));
         when(repository.save(any(User.class))).thenReturn(Mono.just(entity));
 
@@ -102,7 +101,19 @@ class UserServiceTest {
     }
 
     @Test
-    void delete() {
+    void whenDelete_thenReturnSucess() {
+        User entity = buildUser();
+
+        when(repository.findAndRemove(anyString())).thenReturn(Mono.just(entity));
+
+        Mono<User> result = service.delete("123");
+
+        StepVerifier.create(result)
+                .expectNextMatches(user -> user.getClass() == User.class)
+                .expectComplete()
+                .verify();
+
+        verify(repository, times(1)).findAndRemove(anyString());
     }
 
     private User buildUser() {
@@ -118,7 +129,5 @@ class UserServiceTest {
         return new UserRequest("alfeu", "alfeup@hotmail.com", "123");
     }
 
-    private UserResponse buildUserResponse() {
-        return new UserResponse("1","alfeu", "alfeup@hotmail.com", "123");
-    }
+
 }
