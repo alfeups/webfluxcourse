@@ -34,6 +34,7 @@ class UserControllerImplTest {
     public static final String EMAIL = "alfeu@hotmail.com";
     final static String ID = "123";
     public static final String PASSWORD = "123";
+    public static final String ENDPOINT_USERS = "/users";
 
     @Autowired
     private WebTestClient client;
@@ -54,7 +55,7 @@ class UserControllerImplTest {
 
         when(service.save(any(UserRequest.class))).thenReturn(just(buildUser()));
 
-        client.post().uri("/users")
+        client.post().uri(ENDPOINT_USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
@@ -70,13 +71,13 @@ class UserControllerImplTest {
 
         when(service.save(any(UserRequest.class))).thenReturn(just(buildUser()));
 
-        client.post().uri("/users")
+        client.post().uri(ENDPOINT_USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(request))
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.path").isEqualTo("/users")
+                .jsonPath("$.path").isEqualTo(ENDPOINT_USERS)
                 .jsonPath("$.status").isEqualTo(BAD_REQUEST.value())
                 .jsonPath("$.error").isEqualTo("Validation error")
                 .jsonPath("$.message").isEqualTo("Error on validation attributes")
@@ -124,7 +125,7 @@ class UserControllerImplTest {
         when(service.findAll()).thenReturn(Flux.just(User.builder().build()));
         when(mapper.toResponse(any(User.class))).thenReturn(buildUserResponse());
 
-        client.get().uri("/users")
+        client.get().uri(ENDPOINT_USERS)
                 .accept()
                 .exchange()
                 .expectStatus().isOk()
@@ -143,7 +144,7 @@ class UserControllerImplTest {
                 .thenReturn(just(buildUser()));
         when(mapper.toResponse(any(User.class))).thenReturn(userRespose);
 
-        client.patch().uri("/users" + "/" + ID)
+        client.patch().uri(ENDPOINT_USERS + "/" + ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(userRequest))
                 .exchange()
