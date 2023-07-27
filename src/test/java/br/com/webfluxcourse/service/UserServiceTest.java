@@ -4,6 +4,8 @@ import br.com.webfluxcourse.entity.User;
 import br.com.webfluxcourse.mapper.UserMapper;
 import br.com.webfluxcourse.model.request.UserRequest;
 import br.com.webfluxcourse.repository.UserRepository;
+import br.com.webfluxcourse.service.exception.ObjectNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +17,8 @@ import reactor.test.StepVerifier;
 
 import java.util.Objects;
 
+import static java.lang.String.format;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -123,6 +127,20 @@ class UserServiceTest {
                 .email("alfeu@hotmail.com")
                 .password("123")
                 .build();
+    }
+
+    @Test
+    void whenUserNotFound_thenThrowHandlerNotFoundException(){
+        when(repository.findById(anyString())).thenReturn(Mono.empty());
+
+        try {
+            service.findById("123").block();
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+
+            assertEquals(format("Object not found. Id: %s, Type: %s", "123",
+                    User.class.getSimpleName()), ex.getMessage());
+        }
     }
 
     private UserRequest buildUserRequest() {
