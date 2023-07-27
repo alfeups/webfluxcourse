@@ -43,7 +43,7 @@ public class ControllerExceptionHandler {
                 now(),
                 request.getPath().toString(),
                 BAD_REQUEST.value(),
-                "Validation Error...",
+                "Validation error",
                 "Error on validation attributes");
 
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()){

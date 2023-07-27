@@ -15,14 +15,14 @@ public class ValidationError extends StandardError implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final List<FieldError> erros = new ArrayList<>();
+    private final List<FieldError> errors = new ArrayList<>();
 
     ValidationError(LocalDateTime timestamp, String path, Integer status, String error, String message) {
         super(timestamp, path, status, error, message);
     }
 
     public void addError(String fieldName, String message){
-        this.erros.add(new FieldError(fieldName, message));
+        this.errors.add(new FieldError(fieldName, message));
     }
 
 
